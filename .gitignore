@@ -93,3 +93,4 @@ airflow/__pycache__/
 # Notebooks
 notebooks/.ipynb_checkpoints/
 note.txt
+docs/reports/*
