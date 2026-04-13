@@ -144,7 +144,7 @@ services:
       - lakehouse-net
 
   spark:
-    image: bitnami/spark:3.5
+    image: spark:3.5.8
     container_name: spark
     depends_on:
       redpanda:
@@ -161,13 +161,102 @@ services:
       - ./data:/opt/bitnami/spark/data
     networks:
       - lakehouse-net
+  
+  polaris:
+    image: apache/polaris:latest
+    container_name: polaris
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: minio
+      AWS_SECRET_ACCESS_KEY: minio123
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+      polaris.realm-context.realms: POLARIS
+      quarkus.otel.sdk.disabled: "true"
+    ports:
+      - "8181:8181"
+      - "8182:8182"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8182/q/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - lakehouse-net
+  
+  polaris-setup:
+    image: alpine/curl:8.17.0
+    container_name: polaris-setup
+    depends_on:
+      polaris:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        set -e
+        apk add --no-cache jq
+
+        TOKEN_RESPONSE=$(curl --fail-with-body -s -S -X POST \
+          http://polaris:8181/api/catalog/v1/oauth/tokens \
+          -H 'Content-Type: application/x-www-form-urlencoded' \
+          -d 'grant_type=client_credentials&client_id=root&client_secret=s3cr3t&scope=PRINCIPAL_ROLE:ALL')
+
+        TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token')
+
+        PAYLOAD='{
+          "catalog": {
+            "name": "quickstart_catalog",
+            "type": "INTERNAL",
+            "readOnly": false,
+            "properties": {
+              "default-base-location": "s3://warehouse"
+            },
+            "storageConfigInfo": {
+              "storageType": "S3",
+              "allowedLocations": ["s3://warehouse"],
+              "endpoint": "http://localhost:9000",
+              "endpointInternal": "http://minio:9000",
+              "pathStyleAccess": true
+            }
+          }
+        }'
+
+        curl --fail-with-body -s -S -X POST \
+          http://polaris:8181/api/management/v1/catalogs \
+          -H "Authorization: Bearer $TOKEN" \
+          -H "Accept: application/json" \
+          -H "Content-Type: application/json" \
+          -H "Polaris-Realm: POLARIS" \
+          -d "$PAYLOAD" || true
+
+        touch /tmp/polaris-setup-done
+        tail -f /dev/null
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/polaris-setup-done"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    networks:
+      - lakehouse-net
 
   trino:
     image: trinodb/trino:457
     container_name: trino
     depends_on:
+      polaris-setup:
+        condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+    environment:
+      CLIENT_ID: root
+      CLIENT_SECRET: s3cr3t
     ports:
       - "8080:8080"
     volumes:
