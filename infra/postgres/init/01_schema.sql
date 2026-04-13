@@ -2,19 +2,19 @@ CREATE SCHEMA IF NOT EXISTS source;
 
 CREATE TABLE IF NOT EXISTS source.aisles(
     aisle_id INT PRIMARY KEY,
-    aisle TEXT,
+    aisle TEXT
 );
 
 CREATE TABLE IF NOT EXISTS source.departments(
     department_id INT PRIMARY KEY,
-    department TEXT,
+    department TEXT
 );
 
 CREATE TABLE IF NOT EXISTS source.products(
     product_id BIGINT PRIMARY KEY,
     product_name TEXT,
     aisle_id INT,
-    department_id INT,
+    department_id INT
 );
 CREATE TABLE IF NOT EXISTS source.orders(
     order_id BIGINT PRIMARY KEY,
@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS source.orders(
     order_number INT,
     order_dow INT,
     order_hour_of_day INT,
-    days_since_prior_order NUMERIC,
+    days_since_prior_order NUMERIC
 );
 CREATE TABLE IF NOT EXISTS source.order_products_prior(
     order_id BIGINT,
     product_id BIGINT,
     add_to_cart_order BIGINT,
-    reordered INT
+    reordered INT,
     PRIMARY KEY (order_id, product_id)
 );
 
