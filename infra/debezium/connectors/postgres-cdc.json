@@ -1,0 +1,32 @@
+{
+  "name": "instacart-postgres-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "instacart",
+
+    "plugin.name": "pgoutput",
+    "slot.name": "instacart_slot",
+    "publication.name": "dbz_publication",
+    "publication.autocreate.mode": "disabled",
+
+    "topic.prefix": "instacart",
+
+    "schema.include.list": "source",
+    "table.include.list": "source.orders,source.order_products_prior,source.products,source.aisles,source.departments",
+
+    "snapshot.mode": "initial",
+
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "tombstones.on.delete": "false"
+  }
+}
