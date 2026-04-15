@@ -33,32 +33,33 @@ services:
     image: docker.redpanda.com/redpandadata/redpanda:v25.2.6
     container_name: redpanda
     command:
-      - redpanda
-      - start
-      - --overprovisioned
-      - --smp
-      - "1"
-      - --memory
-      - 1G
-      - --reserve-memory
-      - 0M
-      - --node-id
-      - "0"
-      - --check=false
-      - --kafka-addr
-      - internal://0.0.0.0:9092,external://0.0.0.0:19092
-      - --advertise-kafka-addr
-      - internal://redpanda:9092,external://localhost:19092
-      - --pandaproxy-addr
-      - internal://0.0.0.0:8082,external://0.0.0.0:18082
-      - --advertise-pandaproxy-addr
-      - internal://redpanda:8082,external://localhost:18082
-      - --schema-registry-addr
-      - internal://0.0.0.0:8081,external://0.0.0.0:18081
-      - --rpc-addr
-      - redpanda:33145
-      - --advertise-rpc-addr
-      - redpanda:33145
+    - redpanda
+    - start
+    - --overprovisioned
+    - --smp
+    - "1"
+    - --memory
+    - 1G
+    - --reserve-memory
+    - 0M
+    - --node-id
+    - "0"
+    - --check=false
+    - --kafka-addr
+    - internal://0.0.0.0:9092,external://0.0.0.0:19092
+    - --advertise-kafka-addr
+    - internal://redpanda:9092,external://localhost:19092
+    - --pandaproxy-addr
+    - internal://0.0.0.0:8082,external://0.0.0.0:18082
+    - --advertise-pandaproxy-addr
+    - internal://redpanda:8082,external://localhost:18082
+    - --schema-registry-addr
+    - internal://0.0.0.0:8081,external://0.0.0.0:18081
+    - --rpc-addr
+    - redpanda:33145
+    - --advertise-rpc-addr
+    - redpanda:33145
+    - --set redpanda.log_segment_size=104857600
     ports:
       - "19092:19092"
       - "18081:18081"
