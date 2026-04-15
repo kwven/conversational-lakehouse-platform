@@ -45,6 +45,7 @@ def load_data(file_path,table_name,conn):
             #next(reader)
             cursor.copy_expert(copy_sql, f)
         conn.commit()
+        print(f"Data loaded into {table_name} successfully")
     except Exception as e:
         conn.rollback()
         print(f"Error loading data into {table_name} : {e}")
