@@ -182,20 +182,16 @@ services:
   minio-init:
     image: minio/mc:latest
     container_name: minio-init
-    restart: "no"
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint:
-      - /bin/sh
-      - -c
-    command: |
-      set -e
-      /usr/bin/mc alias set local http://minio:9000 minio minio123
-      /usr/bin/mc mb -p local/lakehouse || true
-      /usr/bin/mc mb -p local/checkpoints || true
-      /usr/bin/mc anonymous set private local/lakehouse || true
-      /usr/bin/mc anonymous set private local/checkpoints || true
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      /usr/bin/mc alias set local http://minio:9000 minio minio123 &&
+      /usr/bin/mc mb --ignore-existing local/lakehouse &&
+      /usr/bin/mc mb --ignore-existing local/checkpoints &&
+      /usr/bin/mc anonymous set private local/lakehouse &&
+      /usr/bin/mc anonymous set private local/checkpoints
 
   hive-metastore:
     image: apache/hive:4.0.0
@@ -234,6 +230,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
       hive-metastore:
         condition: service_healthy
     environment:
