@@ -1,5 +1,4 @@
 import psycopg2
-
 from config import Config
 from db import DB_ORDERS, get_connect
 import random
