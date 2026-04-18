@@ -6,5 +6,5 @@ class Config:
     DB_USER = os.getenv("DB_USER", "postgres")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
     SIMULATED_EVAL_SET = os.getenv("SIMULATED_EVAL_SET", "simulated")
-    MIN_SLEEP_SECONDS = int(os.getenv("MIN_SLEEP_SECONDS", "3"))
-    MAX_SLEEP_SECONDS = int(os.getenv("MAX_SLEEP_SECONDS", "8"))
+    MIN_SLEEP_SECONDS = int(os.getenv("MIN_SLEEP_SECONDS", "5"))
+    MAX_SLEEP_SECONDS = int(os.getenv("MAX_SLEEP_SECONDS", "12"))
