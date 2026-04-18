@@ -10,9 +10,8 @@ def get_connect():
         password=Config.DB_PASSWORD,
     )
 
+ ## functions for orders table
 class DB_ORDERS:
-
-    ## functions for orders table
     def get_user_id_random(cur):
         cur.execute(
             """
@@ -51,3 +50,90 @@ class DB_ORDERS:
 
 
 ## functions for order products prior table
+class DB_ORD_PRODUCTS_PRIOR:
+    def get_order_id_random(cur):
+        cur.execute(
+            """
+            SELECT order_id
+            FROM source.orders
+            ORDER BY random()
+            LIMIT 1;
+            """
+        )
+        order_id = cur.fetchone()[0]
+        if not order_id:
+            raise RuntimeError("No order found in source.orders")
+        return order_id
+    def get_product_id_random(cur):
+        cur.execute(
+            """
+            SELECT product_id
+            FROM source.products
+            ORDER BY random()
+            LIMIT 1;
+            """
+        )
+        product_id = cur.fetchone()[0]
+        if not product_id:
+            raise RuntimeError("No product found in source.products")
+        return product_id
+    def get_add_to_cart_order(cur,order_id:int):
+
+        cur.execute(
+            """
+            SELECT COALESCE(count(*) + 1, 0)
+            FROM source.order_products_prior
+            WHERE order_id = %s
+            """,(order_id,),
+        )
+        add_to_cart_order = cur.fetchone()[0]
+        return add_to_cart_order
+
+class DB_AISLES:
+    def get_aisle_id(cur):
+        cur.execute(
+            """
+            SELECT max(aisle_id) + 1 
+            FROM source.aisles;
+            """
+        )
+        return cur.fetchone()[0]
+class DB_PRODUCTS:
+    def get_product_id_random(cur):
+        cur.execute(
+            """
+            SELECT max(product_id) + 1 
+            FROM source.products;
+            """
+        )
+        return cur.fetchone()[0]
+    def get_aisle_id(cur):
+        cur.execute(
+            """
+            SELECT aisle_id
+            FROM source.aisles
+            ORDER BY random()
+            LIMIT 1;
+            """
+        )
+        return cur.fetchone()[0]
+    def get_department_id(cur):
+        cur.execute(
+            """
+            SELECT department_id
+            FROM source.departments
+            ORDER BY random()
+            LIMIT 1;
+            """
+        )
+        return cur.fetchone()[0]
+    
+class DB_DEPARTMENTS:
+    def get_department_id(cur):
+        cur.execute(
+            """
+            SELECT MAX(department_id) + 1 
+            FROM source.departments
+            """
+        )
+        return cur.fetchone()[0]
