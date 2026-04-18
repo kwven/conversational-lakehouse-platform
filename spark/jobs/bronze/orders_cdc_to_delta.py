@@ -7,8 +7,8 @@ from pyspark.sql.streaming import StreamingQuery
 
 topic = Config.KAFKA_TOPIC + "orders"
 row_schema = T.StructType([
-    T.StructField("order_id",T.StringType(),True),
-    T.StructField("user_id",T.StringType(),True),
+    T.StructField("order_id",T.IntegerType(),True),
+    T.StructField("user_id",T.IntegerType(),True),
     T.StructField("eval_set",T.StringType(),True),
     T.StructField("order_number",T.IntegerType(),True),
     T.StructField("order_dow",T.IntegerType(),True),
