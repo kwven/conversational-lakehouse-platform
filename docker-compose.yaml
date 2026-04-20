@@ -185,14 +185,14 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      set -e # Instructs the script to exit immediately if any command fails
-      /usr/bin/mc alias set local http://minio:9000 minio minio123
-      /usr/bin/mc mb --ignore-existing local/lakehouse
-      /usr/bin/mc mb --ignore-existing local/checkpoints
-      /usr/bin/mc anonymous set none local/lakehouse
-      /usr/bin/mc anonymous set none local/checkpoints
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        /usr/bin/mc alias set local http://minio:9000 minio minio123
+        /usr/bin/mc mb --ignore-existing local/lakehouse
+        /usr/bin/mc mb --ignore-existing local/checkpoints
+        /usr/bin/mc anonymous set none local/lakehouse
+        /usr/bin/mc anonymous set none local/checkpoints
 
   hive-metastore:
     image: apache/hive:4.0.0
@@ -264,15 +264,24 @@ services:
         condition: service_started
     environment:
       SPARK_LOCAL_IP: spark-worker
+      SPARK_LOCAL_DIRS: /tmp/spark-local
+      SPARK_WORKER_OPTS: >-
+        -Dspark.worker.dir=/tmp/spark-local/worker
+        -Dspark.worker.cleanup.enabled=true
+        -Dspark.worker.cleanup.interval=600
+        -Dspark.worker.cleanup.appDataTtl=3600
       AWS_ACCESS_KEY_ID: minio
       AWS_SECRET_ACCESS_KEY: minio123
       AWS_REGION: us-east-1
     volumes:
       - ./:/workspace
+    tmpfs:
+      - /tmp/spark-local:rw,mode=1777
     working_dir: /workspace
     command: >-
-      /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker
-      spark://spark-master:7077
+      /bin/bash -lc 'mkdir -p /tmp/spark-local/worker &&
+      exec /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker
+      spark://spark-master:7077'
 
   spark-submit:
     image: spark:4.0.2-python3
@@ -292,8 +301,11 @@ services:
       AWS_SECRET_ACCESS_KEY: minio123
       AWS_REGION: us-east-1
       SPARK_LOCAL_IP: spark-submit
+      SPARK_LOCAL_DIRS: /tmp/spark-local
     volumes:
       - ./:/workspace
+    tmpfs:
+      - /tmp/spark-local:rw,mode=1777
     working_dir: /workspace
     entrypoint:
       - /bin/bash
