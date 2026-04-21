@@ -1,10 +1,21 @@
-from pyspark.sql import types as T 
+import os
+
+from pyspark.sql import types as T
+
+
+def _env(name: str, default=None):
+    value = os.getenv(name)
+    return value if value not in (None, "") else default
+
+
 class Config:
-    BOOTSTRAP_SERVERS = "kafka:9092"
-    OFFSET = "earliest"
-    CHECKPOINT_LOCATION = "s3a://lakehouse/checkpoints/"
-    KAFKA_TOPIC = "instacart.source."
-    BRONZE_PATH = "s3a://lakehouse/"
+    BOOTSTRAP_SERVERS = _env("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+    OFFSET = _env("STREAM_STARTING_OFFSETS", "earliest")
+    MAX_OFFSETS_PER_TRIGGER = _env("STREAM_MAX_OFFSETS_PER_TRIGGER")
+    CHECKPOINT_LOCATION = _env("CHECKPOINT_LOCATION", "s3a://checkpoints/")
+    KAFKA_TOPIC = _env("KAFKA_TOPIC_PREFIX", "instacart.source.")
+    BRONZE_PATH = _env("BRONZE_PATH", "s3a://lakehouse/")
+    SILVER_PATH = _env("SILVER_PATH", "s3a://lakehouse/silver/")
     SOURCE_SCHEMA = T.StructType([
         T.StructField("version",T.StringType(),True), 
         T.StructField("connector",T.StringType(),True),
