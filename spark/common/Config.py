@@ -16,6 +16,7 @@ class Config:
     KAFKA_TOPIC = _env("KAFKA_TOPIC_PREFIX", "instacart.source.")
     BRONZE_PATH = _env("BRONZE_PATH", "s3a://lakehouse/")
     SILVER_PATH = _env("SILVER_PATH", "s3a://lakehouse/silver/")
+    GOLD_PATH = _env("GOLD_PATH","s3a://lakehouse/gold/")
     SOURCE_SCHEMA = T.StructType([
         T.StructField("version",T.StringType(),True), 
         T.StructField("connector",T.StringType(),True),
