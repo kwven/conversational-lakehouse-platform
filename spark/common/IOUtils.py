@@ -5,6 +5,7 @@ from common.Config import Config
 
 
 class IOUtils:
+    # beonze jobs
     @staticmethod
     def read_stream(spark: SparkSession, topic: str):
         reader = (
@@ -31,12 +32,20 @@ class IOUtils:
             .start(target_path)
         )
         return query
-
+    # silver jobs 
     @staticmethod
     def read_delta_stream(spark,bronze_table):
         read = spark.readStream.format('delta').load(Config.BRONZE_PATH + bronze_table)
         return read
     @staticmethod
-    def write_delta_stream(df:DataFrame,merge_to_silver,silver_path:str,path_table:str):
-        target = silver_path + path_table
+    def write_delta_stream(df:DataFrame,merge_to_silver,path_table:str):
+        target = "silver/" + path_table
         df.writeStream.format("delta").foreachBatch(merge_to_silver).option("checkpointLocation", Config.CHECKPOINT_LOCATION + target).start()
+    # gold jobs
+    @staticmethod
+    def read_delta(spark,silver_table):
+        read = spark.read.format("delta").load(Config.SILVER_PATH + silver_table)
+        return read
+    def write_delta(df:DataFrame,gold_table):
+        df.write.format("delta").mode("overwrite").save(Config.GOLD_PATH + gold_table)
+
