@@ -68,7 +68,7 @@ def transform(df:DataFrame,batch_id: int):
     )
 
 def load(df_clean:DataFrame,merge_to_silver:Callable):
-    return IOUtils.write_delta_stream(df_clean,merge_to_silver, Config.SILVER_PATH, "order_products_prior_clean")
+    return IOUtils.write_delta_stream(df_clean,merge_to_silver, "order_products_prior_clean")
     
 def main():
     spark = SparkSessionFactory.create("silver-order_products_prior")

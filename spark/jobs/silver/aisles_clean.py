@@ -61,7 +61,7 @@ def transform(df:DataFrame,batch_id: int):
     )
 
 def load(df_clean:DataFrame,merge_to_silver:Callable):
-    return IOUtils.write_delta_stream(df_clean,merge_to_silver, Config.SILVER_PATH, "aisles_clean")
+    return IOUtils.write_delta_stream(df_clean,merge_to_silver, "aisles_clean")
     
 def main():
     spark = SparkSessionFactory.create("silver-aisles")
