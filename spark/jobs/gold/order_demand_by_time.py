@@ -1,4 +1,3 @@
-#order_day_of_week order_hour,days_since_previous_order
 from pyspark.sql import functions as F
 from common.IOUtils import IOUtils
 from common.Config import Config
