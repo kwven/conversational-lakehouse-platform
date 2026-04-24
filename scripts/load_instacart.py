@@ -25,7 +25,6 @@ def get_db_connection():
 
 def create_tables(schema_path, conn):
     cursor = conn.cursor()
-    #schema_path = Path('/infra/postgres/init/01_schema.sql')
     try:
         cursor.execute(schema_path.read_text())
     except Exception as e:
@@ -35,14 +34,11 @@ def create_tables(schema_path, conn):
 
 def load_data(file_path,table_name,conn):
     cursor = conn.cursor()
-    #file_path = Path('/data/instacart/aisles.csv')
     copy_sql = f"COPY {table_name} FROM STDIN WITH (FORMAT CSV, HEADER)"
     truncate_sql = f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;"
     try:
         cursor.execute(truncate_sql)
         with open(file_path , 'r',encoding = 'utf-8') as f:
-            #reader = csv.reader(f,delimiter = ',')
-            #next(reader)
             cursor.copy_expert(copy_sql, f)
         conn.commit()
         print(f"Data loaded into {table_name} successfully")
