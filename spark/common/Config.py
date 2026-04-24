@@ -14,7 +14,7 @@ class Config:
     MAX_OFFSETS_PER_TRIGGER = _env("STREAM_MAX_OFFSETS_PER_TRIGGER")
     CHECKPOINT_LOCATION = _env("CHECKPOINT_LOCATION", "s3a://checkpoints/")
     KAFKA_TOPIC = _env("KAFKA_TOPIC_PREFIX", "instacart.source.")
-    BRONZE_PATH = _env("BRONZE_PATH", "s3a://lakehouse/")
+    BRONZE_PATH = _env("BRONZE_PATH", "s3a://lakehouse/bronze/")
     SILVER_PATH = _env("SILVER_PATH", "s3a://lakehouse/silver/")
     GOLD_PATH = _env("GOLD_PATH","s3a://lakehouse/gold/")
     SOURCE_SCHEMA = T.StructType([

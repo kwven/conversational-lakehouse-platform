@@ -28,8 +28,10 @@ class IOUtils:
         query = (
             df.writeStream.format("delta")
             .outputMode("append")
+            .option("path", target_path)
             .option("checkpointLocation", checkpoint_path)
-            .start(target_path)
+            .queryName("bronze-"+path_table+"-cdc")
+            .toTable("bronze."+path_table)
         )
         return query
     # silver jobs 
@@ -40,12 +42,12 @@ class IOUtils:
     @staticmethod
     def write_delta_stream(df:DataFrame,merge_to_silver,path_table:str):
         target = "silver/" + path_table
-        df.writeStream.format("delta").foreachBatch(merge_to_silver).option("checkpointLocation", Config.CHECKPOINT_LOCATION + target).start()
+        df.writeStream.format("delta").foreachBatch(merge_to_silver).option("checkpointLocation", Config.CHECKPOINT_LOCATION + target).queryName("silver-"+path_table+"-clean").start()
     # gold jobs
     @staticmethod
     def read_delta(spark,silver_table):
         read = spark.read.format("delta").load(Config.SILVER_PATH + silver_table)
         return read
     def write_delta(df:DataFrame,gold_table):
-        df.write.format("delta").mode("overwrite").save(Config.GOLD_PATH + gold_table)
+        df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").option("path",Config.GOLD_PATH + gold_table).saveAsTable("gold."+gold_table)
 
