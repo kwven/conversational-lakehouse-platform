@@ -84,7 +84,7 @@ def transform_orders(df: DataFrame):
     return df_transform
 
 def load_orders(df_clean: DataFrame) -> StreamingQuery:
-    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "bronze/orders")
+    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "orders")
 
 def main():
     spark = SparkSessionFactory.create("bronze-orders")

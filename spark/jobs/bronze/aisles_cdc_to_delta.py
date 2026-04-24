@@ -75,7 +75,7 @@ def transform_aisles(df: DataFrame):
     return df_transform
 
 def load_aisles(df_clean: DataFrame) -> StreamingQuery:
-    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "bronze/aisles")
+    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "aisles")
 
 def main():
     spark = SparkSessionFactory.create("bronze-aisles")

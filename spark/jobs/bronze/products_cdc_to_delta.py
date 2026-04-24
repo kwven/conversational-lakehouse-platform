@@ -78,7 +78,7 @@ def transform_products(df: DataFrame):
     return df_transform
 
 def load_products(df_clean: DataFrame) -> StreamingQuery:
-    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "bronze/products")
+    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "products")
 
 def main():
     spark = SparkSessionFactory.create("bronze-products")

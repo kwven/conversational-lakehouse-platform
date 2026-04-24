@@ -78,7 +78,7 @@ def transform_order_products_prior(df: DataFrame):
     return df_transform
 
 def load_order_products_prior(df_clean: DataFrame) -> StreamingQuery:
-    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "bronze/order_products_prior")
+    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "order_products_prior")
 
 def main():
     spark = SparkSessionFactory.create("bronze-order_products_prior")

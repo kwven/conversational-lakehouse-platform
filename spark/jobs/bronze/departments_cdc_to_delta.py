@@ -74,7 +74,7 @@ def transform_departments(df: DataFrame):
     return df_transform
 
 def load_departments(df_clean: DataFrame) -> StreamingQuery:
-    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "bronze/departments")
+    return IOUtils.write_stream(df_clean, Config.BRONZE_PATH, "departments")
 
 def main():
     spark = SparkSessionFactory.create("bronze-departments")
