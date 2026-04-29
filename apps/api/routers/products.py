@@ -33,3 +33,54 @@ def get_top_products(limit:int = Query(default=10,ge=1,le=50),department:str | N
         "limit": limit,
         "data": result, 
     }
+
+@router.get("/by-department")
+def get_products_by_department(department:int):
+    params = []
+    sql = f"""
+        SELECT
+            product_id,
+            product_name,
+            aisle,
+            department,
+            total_purchases,
+            distinct_orders,
+            unique_users,
+            total_reorders,
+            reorder_rate_pct,
+            product_rank
+        FROM gold.top_products_clean
+        WHERE department_id = ?
+    """
+    params.append(department)
+    result = list(stream_query_results(sql, params))
+    return {
+        "metric": "products_by_department",
+        "department": department,
+        "data": result, 
+    }
+@router.get("/by-aisle")
+def get_products_by_aisle(aisle:int):
+    params = []
+    sql = f"""
+        SELECT
+            product_id,
+            product_name,
+            aisle,
+            department,
+            total_purchases,
+            distinct_orders,
+            unique_users,
+            total_reorders,
+            reorder_rate_pct,
+            product_rank
+        FROM gold.top_products_clean
+        WHERE aisle_id = ?
+    """
+    params.append(aisle)
+    result = list(stream_query_results(sql, params))
+    return {
+        "metric": "products_by_aisle",
+        "aisle": aisle,
+        "data": result, 
+    }
