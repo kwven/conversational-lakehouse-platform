@@ -330,7 +330,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 20
-
+  fastapi:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: fastapi
+    depends_on:
+      - trino
+    environment:
+      TRINO_HOST: trino
+      TRINO_PORT: 8080
+      TRINO_USER: api
+      TRINO_CATALOG: delta
+      TRINO_SCHEMA: gold
+    ports:
+      - "8000:8000"
 volumes:
   postgres-data:
   metastore-db-data:
